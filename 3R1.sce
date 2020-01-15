@@ -151,7 +151,7 @@ endfunction
 figure()
 clf()
 
-y_array=[]
+
 
 for t=0:(5/n_iter):5
 
@@ -170,7 +170,7 @@ for t=0:(5/n_iter):5
 //Representem la velocitat angular de cada joint respecte el temps
 plotW(w1,w2,w3,t);
 
-y_array=[y_array y]
+
 
 y= y-(0.5/n_iter)
 
@@ -195,13 +195,12 @@ for t=5:(5/n_iter):10
 //Representem la velocitat angular de cada joint respecte el temps
 plotW(w1,w2,w3,t);
 
-y_array=[y_array y]
+
 
 y= y+(0.5/n_iter)
 
 end
 
-disp(y_array)
 
 
 
