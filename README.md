@@ -15,7 +15,7 @@ of g3)
 4 - In the function that solves the inverse position analysis of the robot, add a check to guarantee that the inputs are inside the workspace of the robot
 
 
-All the code needed to run the simulation is provided in the 3R1.sce file. Just click play and the simulation will start.
+All the code needed to run the simulation is provided in the 3R1.sce and 3r1_plus.sce files. Just click play and the simulation will start.
 
 The file iniciates with the declaration of all the constants and parameters used.
 
@@ -25,3 +25,5 @@ The main program that simulate the motion is divided in two loops, one for down-
 The second loop is identhical to the first one, but it goes from the final position to the inicial position of the end-effector. 
 
 Some parameters, as the velocity (v) and the number of iterations (n_iter) can be tunned by the user just changing it's values on the parameter declaration section.
+
+3R1_plus.sce file contains the same code described before and in addition the torque has been computed for each time, considering that one product is added  to the end-effector for second. The center of masses are located on the middle of each link

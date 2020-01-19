@@ -10,7 +10,12 @@ y=-0.2
 gamma=0
 v=-0.1
 n_iter=100
-
+//definim constants de massa i g
+m_l1=4
+m_l2=3
+m_EE=2
+m_prod=1
+g=9.81
 
 //definim funció cinematica directe
 
@@ -95,7 +100,6 @@ a.data_bounds = [-0.2,-1;1,0] //limit eixos
 a.axes_visible="on";
 xlabel("m")
 ylabel("m")
-
 //Borrar anterior
 a = gca();
 delete(a.children);
@@ -127,14 +131,14 @@ e = gce();
 point = e.children(1);
 point.mark_mode="on";
 point.mark_size =1;
-point.mark_foreground=2;
+point.mark_foreground=3;
 
 plot2d(t,w2, 0);
 e = gce();
 point = e.children(1);
 point.mark_mode="on";
 point.mark_size =1;
-point.mark_foreground=3;
+point.mark_foreground=2;
 
 plot2d(t,w3, 0);
 e = gce();
@@ -147,19 +151,48 @@ hl=legend(['w1';'w2';'w3'])
 
 endfunction
 
+//definim funció pel calcul del parell total
+function [thau]=torque(theta1, theta2, gamma, pose_J1, pose_J2, pose_J3)
+
+//calculem posició centre de masses
+pose_cm1=[pose_J1(1)+(l1/2)*cos(theta1);pose_J2(2)+(l1/2)*sin(theta1)]
+pose_cm2=[pose_J2(1)+(l2/2)*cos(theta1+theta2);pose_J2(2)+(l2/2)*sin(theta1+theta2)]
+pose_cm3=[pose_J3(1)+(g1+g3/2)*sin(gamma); pose_J3(2)-g2*cos(gamma)]
+
+//calcul del parell(sum F·d)
+thau=m_l1*g*pose_cm1(1)+m_l2*g*pose_cm2(1)+m_EE*g*pose_cm3(1)
+
+endfunction
+
+//funcio per representar el torque respecte el temps
+function[]=plottorque(thau,t)
+
+subplot(223)
+title("Torque - Time", "fontsize",5)
+a=get("current_axes") //eixos
+a.data_bounds = [0,0;10,50]
+xlabel("seconds")
+ylabel("N·m")
+
+plot2d(t,thau, 0)
+e = gce();
+point = e.children(1);
+point.mark_mode="on";
+point.mark_size =0.9;
+point.mark_foreground=5;
+
+endfunction
 
 
-
-//establim bucle pel moviment de baixada
 
 figure()
 clf()
 
-
+//establim bucle pel moviment de baixada
 
 for t=0:(5/n_iter):5
 
-// partint de la posició inicial fem calcul cinemàtica inversa
+// partint de la posició iniocial fem calcul cinemàtica inversa
 [theta1,theta2,theta3] = inverse(x,y,gamma);
 
 // calculem POSE joints
@@ -174,14 +207,26 @@ for t=0:(5/n_iter):5
 //Representem la velocitat angular de cada joint respecte el temps
 plotW(w1,w2,w3,t);
 
+//A cada segon que passa afeguim un kg de pes al end-effector
+if (t==1|t==2|t==3|t==4|t==5) then
+    m_EE=m_EE+m_prod;
+end
+
+//calcul del parell a J1
+[thau]=torque(theta1, theta2, gamma, pose_J1, pose_J2, pose_J3)
+
+//Representem torque respecte temps
+plottorque(thau,t)
 
 
 y= y-(0.5/n_iter)
 
 end
+//decarraguem el end-effector
+
+m_EE=2
 
 //definim bucle pel moviment de pujada
-
 for t=5:(5/n_iter):10
 
 // partint de la posició final fem calcul cinemàtica inversa
@@ -199,12 +244,17 @@ for t=5:(5/n_iter):10
 //Representem la velocitat angular de cada joint respecte el temps
 plotW(w1,w2,w3,t);
 
+//calcul del parell a J1
+[thau]=torque(theta1, theta2, gamma, pose_J1, pose_J2, pose_J3)
+
+//Representem torque respecte temps
+plottorque(thau,t)
+
 
 
 y= y+(0.5/n_iter)
 
 end
-
 
 
 
